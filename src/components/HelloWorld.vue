@@ -1,11 +1,10 @@
 <template>
   <div class="hello">
-    
     <button
       type="button"
       @click="onLoadData"
       v-if="isEditing"
-      class="btn btn-secondary"
+      class="btn btn-secondary mb-3"
     >
       {{ description }}
     </button>
@@ -29,9 +28,12 @@
         </button>
       </div>
     </div>
-    <!-- <div class="input-group mb-3">
-  <input type="text" v-model="filter" @change="filterBy" class="form-control" placeholder="найти" aria-label="найти" aria-describedby="basic-addon1">
-</div> -->
+<div class="alert alert-danger" v-if="isError" role="alert">
+  Ошибка получения данных
+</div>
+<div v-if="isLoading" class="spinner-border text-primary" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
     <table v-if="tableData && tableData.length > 0" class="table table-hover">
       <thead>
         <tr>
@@ -47,10 +49,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr @click="showModal(tableRow)" v-for="(tableRow, i) in tableData" :key="i">
+        <tr
+          @click="showModal(tableRow)"
+          v-for="(tableRow, i) in tableData"
+          :key="i"
+        >
           <td>{{ tableRow.name }}</td>
           <td>{{ tableRow.company }}</td>
           <td>{{ tableRow.email }}</td>
+          <td>{{ tableRow.address }}</td>
           <td>
             <span v-if="tableRow.add">{{ tableRow.add.state }}</span>
             <span v-else>Штат не указан</span>
@@ -66,7 +73,7 @@
     >
       <span>{{ description }}</span>
     </button> -->
-    <modal :isOpen="isOpenModal" :value ="rowCurrent" @close="closeModal" />
+    <modal :isOpen="isOpenModal" :value="rowCurrent" @close="closeModal" />
   </div>
 </template>
 
@@ -80,12 +87,14 @@ export default {
   data() {
     return {
       isEditing: true,
+      isError: false,
+      isLoading: false,
       sortReverse: false,
-      rowCurrent:null,
+      rowCurrent: null,
       isOpenModal: false,
       sortColumn: "",
       filter: "",
-      columns: ["address", "company", "email", "name", "state"],
+      columns: ["name", "company", "email","address", "state"],
       tableData: [],
       url: "https://app.dev-wazzup24.com/api/v1/wazzup_test/",
     };
@@ -129,14 +138,16 @@ export default {
       this.tableData.sort(this.byField(sortColumn));
     },
     async onLoadData() {
+      this.isLoading = true;
       let response = await fetch(this.url);
 
       if (response.ok) {
         let json = await response.json();
         this.tableData = json;
-        console.log(this.tableData);
+        this.isLoading = false;
       } else {
-        alert("Ошибка HTTP: " + response.status);
+        this.isError = true;
+        this.isLoading = false;
       }
     },
   },

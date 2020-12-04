@@ -20,6 +20,9 @@
 
           <div class="modal-body">
             <slot name="body">
+              <ul class="list-unstyled">
+  <li>Lorem ipsum dolor sit amet</li>
+</ul>
               {{value}}
             </slot>
           </div>
