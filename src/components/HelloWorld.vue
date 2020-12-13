@@ -1,5 +1,10 @@
 <template>
   <div class="hello">
+<div v-if="displayTableData && displayTableData.length>0"> 
+<span v-for="(date,f) in displayTableData" :key="f">
+  {{date.name}}
+</span>
+</div>
     <button
       type="button"
       @click="onLoadData"
@@ -34,6 +39,72 @@
 <div v-if="isLoading" class="spinner-border text-primary" role="status">
   <span class="sr-only">Loading...</span>
 </div>
+
+
+ <ul class="pagination">
+    <!-- <li 
+      class="pagination-item"
+    >
+      <button 
+        type="button" 
+        @click="onClickFirstPage"
+        :disabled="isInFirstPage"
+        aria-label="Go to first page"
+      >
+        First
+      </button>
+    </li> -->
+
+    <li
+      class="pagination-item"
+    >
+      <button 
+        type="button" 
+        @click="onClickPreviousPage"
+        :disabled="isInFirstPage"
+        aria-label="Go to previous page"
+      >
+        Previous
+      </button>
+    </li>
+
+    <!-- <li v-for="(page,i) in pages" class="pagination-item" :key="i">
+      <button 
+        type="button" 
+        @click="onClickPage(page.name)"
+        :disabled="page.isDisabled"
+        :class="{ active: isPageActive(page.name) }"
+        :aria-label="`Go to page number ${page.name}`"
+        
+      >
+        {{ page.name }}
+      </button>
+    </li> -->
+
+    <li class="pagination-item">
+      <button 
+        type="button" 
+        @click="onClickNextPage"
+        :disabled="isInLastPage"
+        aria-label="Go to next page"
+      >
+        Next
+      </button>
+    </li>
+
+    <!-- <li class="pagination-item">
+      <button 
+        type="button" 
+        @click="onClickLastPage"
+        :disabled="isInLastPage"
+        aria-label="Go to last page"
+      >
+        Last
+      </button>
+    </li> -->
+  </ul>
+
+
     <table v-if="tableData && tableData.length > 0" class="table table-hover">
       <thead>
         <tr>
@@ -79,6 +150,7 @@
 
 <script>
 import modal from "./modal.vue";
+
 export default {
   name: "HelloWorld",
   components: {
@@ -87,8 +159,14 @@ export default {
   data() {
     return {
       isEditing: true,
+      isInFirstPage: false,
+      isInLastPage: false,
       isError: false,
+      kek:[...Array(150).keys()].map(i => ({ id: (i+1), name: 'Item ' + (i+1) })),
       isLoading: false,
+      page:1,
+      pages: [],
+      perPage:10,
       sortReverse: false,
       rowCurrent: null,
       isOpenModal: false,
@@ -96,6 +174,7 @@ export default {
       filter: "",
       columns: ["name", "company", "email","address", "state"],
       tableData: [],
+      displayTableData:[],
       url: "https://app.dev-wazzup24.com/api/v1/wazzup_test/",
     };
   },
@@ -105,8 +184,25 @@ export default {
       default: "Загрузить пользователей",
     },
   },
+  mounted(){
+    this.displayTableData = this.kek.slice(0,this.perPage)
+  },
   methods: {
+    paginate(data){
+      const from = (this.page * this.perPage)-this.perPage;
+      const to = this.page * this.perPage;
+      return data.slice(from,to)
+    },
+    onClickPreviousPage(){
+      this.page = this.page - 1
+      this.displayTableData = this.paginate(this.kek)
+    },
+     onClickNextPage(){
+      this.page = this.page + 1
+      this.displayTableData = this.paginate(this.kek)
+    },
     showModal(row) {
+      console.log(this.kek)
       this.isOpenModal = true;
       this.rowCurrent = row;
     },
@@ -143,6 +239,7 @@ export default {
 
       if (response.ok) {
         let json = await response.json();
+        console.log(json)
         this.tableData = json;
         this.isLoading = false;
       } else {
