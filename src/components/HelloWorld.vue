@@ -1,10 +1,6 @@
 <template>
   <div class="hello">
-<div v-if="displayTableData && displayTableData.length>0"> 
-<span v-for="(date,f) in displayTableData" :key="f">
-  {{date.name}}
-</span>
-</div>
+   
     <button
       type="button"
       @click="onLoadData"
@@ -33,79 +29,17 @@
         </button>
       </div>
     </div>
-<div class="alert alert-danger" v-if="isError" role="alert">
-  Ошибка получения данных
-</div>
-<div v-if="isLoading" class="spinner-border text-primary" role="status">
-  <span class="sr-only">Loading...</span>
-</div>
+    <div class="alert alert-danger" v-if="isError" role="alert">
+      Ошибка получения данных
+    </div>
+    <div v-if="isLoading" class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
 
-
- <ul class="pagination">
-    <!-- <li 
-      class="pagination-item"
+    <table
+      v-if="tableDataDisplay && tableDataDisplay.length > 0"
+      class="table table-hover"
     >
-      <button 
-        type="button" 
-        @click="onClickFirstPage"
-        :disabled="isInFirstPage"
-        aria-label="Go to first page"
-      >
-        First
-      </button>
-    </li> -->
-
-    <li
-      class="pagination-item"
-    >
-      <button 
-        type="button" 
-        @click="onClickPreviousPage"
-        :disabled="isInFirstPage"
-        aria-label="Go to previous page"
-      >
-        Previous
-      </button>
-    </li>
-
-    <!-- <li v-for="(page,i) in pages" class="pagination-item" :key="i">
-      <button 
-        type="button" 
-        @click="onClickPage(page.name)"
-        :disabled="page.isDisabled"
-        :class="{ active: isPageActive(page.name) }"
-        :aria-label="`Go to page number ${page.name}`"
-        
-      >
-        {{ page.name }}
-      </button>
-    </li> -->
-
-    <li class="pagination-item">
-      <button 
-        type="button" 
-        @click="onClickNextPage"
-        :disabled="isInLastPage"
-        aria-label="Go to next page"
-      >
-        Next
-      </button>
-    </li>
-
-    <!-- <li class="pagination-item">
-      <button 
-        type="button" 
-        @click="onClickLastPage"
-        :disabled="isInLastPage"
-        aria-label="Go to last page"
-      >
-        Last
-      </button>
-    </li> -->
-  </ul>
-
-
-    <table v-if="tableData && tableData.length > 0" class="table table-hover">
       <thead>
         <tr>
           <th
@@ -122,7 +56,7 @@
       <tbody>
         <tr
           @click="showModal(tableRow)"
-          v-for="(tableRow, i) in tableData"
+          v-for="(tableRow, i) in tableDataDisplay"
           :key="i"
         >
           <td>{{ tableRow.name }}</td>
@@ -136,45 +70,48 @@
         </tr>
       </tbody>
     </table>
-    <!-- <button
-      class="btn border-0 flex-grow-1 text-left shadow-none"
-      :class="{ completed }"
-      @click="$emit('on-toggle')"
-      v-if="!isEditing"
-    >
-      <span>{{ description }}</span>
-    </button> -->
+     <Pagination
+      v-if="pagination"
+      :total-pages="pagination.totalPages"
+      :total="pagination.totalItems"
+      :per-page="pagination.perPage"
+      :current-page="pagination.currentPage"
+      @pagechanged="onPageChange"
+    />
+
     <modal :isOpen="isOpenModal" :value="rowCurrent" @close="closeModal" />
   </div>
 </template>
 
 <script>
 import modal from "./modal.vue";
+import Pagination from "./Pagination.vue";
 
 export default {
   name: "HelloWorld",
   components: {
     modal,
+    Pagination,
   },
   data() {
     return {
       isEditing: true,
       isInFirstPage: false,
-      isInLastPage: false,
+      pagination: {
+        currentPage: 1,
+        perPage: 10,
+        totalPages: 10,
+        totalItems: 10,
+      },
       isError: false,
-      kek:[...Array(150).keys()].map(i => ({ id: (i+1), name: 'Item ' + (i+1) })),
       isLoading: false,
-      page:1,
-      pages: [],
-      perPage:10,
       sortReverse: false,
       rowCurrent: null,
       isOpenModal: false,
       sortColumn: "",
       filter: "",
-      columns: ["name", "company", "email","address", "state"],
+      columns: ["name", "company", "email", "address", "state"],
       tableData: [],
-      displayTableData:[],
       url: "https://app.dev-wazzup24.com/api/v1/wazzup_test/",
     };
   },
@@ -184,25 +121,21 @@ export default {
       default: "Загрузить пользователей",
     },
   },
-  mounted(){
-    this.displayTableData = this.kek.slice(0,this.perPage)
+  computed: {
+    tableDataDisplay() {
+      return this.tableData.slice(
+        (this.pagination.currentPage - 1) * this.pagination.perPage,
+        this.pagination.currentPage * this.pagination.perPage
+      );
+    },
   },
+
   methods: {
-    paginate(data){
-      const from = (this.page * this.perPage)-this.perPage;
-      const to = this.page * this.perPage;
-      return data.slice(from,to)
-    },
-    onClickPreviousPage(){
-      this.page = this.page - 1
-      this.displayTableData = this.paginate(this.kek)
-    },
-     onClickNextPage(){
-      this.page = this.page + 1
-      this.displayTableData = this.paginate(this.kek)
+    onPageChange(page) {
+      this.pagination.currentPage = page;
     },
     showModal(row) {
-      console.log(this.kek)
+      console.log(this.kek);
       this.isOpenModal = true;
       this.rowCurrent = row;
     },
@@ -235,12 +168,14 @@ export default {
     },
     async onLoadData() {
       this.isLoading = true;
-      let response = await fetch(this.url);
-
+      const response = await fetch(this.url);
       if (response.ok) {
-        let json = await response.json();
-        console.log(json)
-        this.tableData = json;
+        let value = await response.json();
+        this.tableData = [...value];
+        this.pagination.totalPages = Math.ceil(
+          this.tableData.length / this.pagination.perPage
+        );
+        this.pagination.totalItems = this.tableData.length;
         this.isLoading = false;
       } else {
         this.isError = true;
