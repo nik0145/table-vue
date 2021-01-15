@@ -35,7 +35,7 @@
     <div v-if="isLoading" class="spinner-border text-primary" role="status">
       <span class="sr-only">Loading...</span>
     </div>
-
+<!-- 
     <table
       v-if="tableDataDisplay && tableDataDisplay.length > 0"
       class="table table-hover"
@@ -69,7 +69,8 @@
           </td>
         </tr>
       </tbody>
-    </table>
+    </table> -->
+    <VTable :columns="columns" :data="tableDataDisplay"/> 
      <Pagination
       v-if="pagination"
       :total-pages="pagination.totalPages"
@@ -86,12 +87,14 @@
 <script>
 import modal from "./modal.vue";
 import Pagination from "./Pagination.vue";
+import VTable from "./VTable.vue";
 
 export default {
   name: "HelloWorld",
   components: {
     modal,
     Pagination,
+    VTable,
   },
   data() {
     return {
@@ -105,10 +108,10 @@ export default {
       },
       isError: false,
       isLoading: false,
-      sortReverse: false,
+      
       rowCurrent: null,
       isOpenModal: false,
-      sortColumn: "",
+      
       filter: "",
       columns: ["name", "company", "email", "address", "state"],
       tableData: [],
@@ -157,15 +160,7 @@ export default {
       });
       this.tableData = kek;
     },
-    byField: function(field) {
-      return (a, b) =>
-        a[field] > b[field] ? (this.reverse ? 1 : -1) : this.reverse ? -1 : 1;
-    },
-    sortBy: function(sortColumn) {
-      this.reverse = this.sortColumn == sortColumn ? !this.reverse : false;
-      this.sortColumn = sortColumn;
-      this.tableData.sort(this.byField(sortColumn));
-    },
+
     async onLoadData() {
       this.isLoading = true;
       const response = await fetch(this.url);
