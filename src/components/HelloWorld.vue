@@ -23,9 +23,16 @@
           class="btn btn-outline-secondary"
           @click="filterBy"
           type="button"
-          id="button-addon2"
         >
           найти
+        </button>
+         <button
+          class="btn btn-outline-secondary"
+          v-if="filter"
+          @click="resetFilter"
+          type="button"
+        >
+          Сбросить фильтр
         </button>
       </div>
     </div>
@@ -35,41 +42,6 @@
     <div v-if="isLoading" class="spinner-border text-primary" role="status">
       <span class="sr-only">Loading...</span>
     </div>
-<!-- 
-    <table
-      v-if="tableDataDisplay && tableDataDisplay.length > 0"
-      class="table table-hover"
-    >
-      <thead>
-        <tr>
-          <th
-            v-for="(tableTh, i) in columns"
-            scope="col"
-            class="cursor-pointer"
-            :key="i"
-            @click="sortBy(tableTh)"
-          >
-            {{ tableTh }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          @click="showModal(tableRow)"
-          v-for="(tableRow, i) in tableDataDisplay"
-          :key="i"
-        >
-          <td>{{ tableRow.name }}</td>
-          <td>{{ tableRow.company }}</td>
-          <td>{{ tableRow.email }}</td>
-          <td>{{ tableRow.address }}</td>
-          <td>
-            <span v-if="tableRow.add">{{ tableRow.add.state }}</span>
-            <span v-else>Штат не указан</span>
-          </td>
-        </tr>
-      </tbody>
-    </table> -->
     <VTable :columns="columns" @selectRow="onSelectRow" :data="tableDataDisplay"/> 
      <Pagination
       v-if="pagination"
@@ -131,6 +103,10 @@ export default {
       this.isOpenModal = true;
       this.rowCurrent = row;
     },
+    resetFilter(){
+      this.filter='';
+      this.onChangeTableData();
+    },
     onChangeTableData(){
       
         this.tableDataDisplay= this.tableData.slice(
@@ -146,19 +122,13 @@ export default {
       this.isOpenModal = false;
     },
     filterBy: function() {
-      //! не забыть допилить стейт
       let filter = this.filter.toLowerCase();
-      console.log(this.filter);
-      let kek = this.tableData.filter((item) => {
+      this.tableDataDisplay = this.tableDataDisplay.filter((item) => {
         return Object.values(item).some(
           (prop) =>
-            !filter ||
-            (typeof prop === "string"
-              ? prop.includes(filter)
-              : prop.toString().includes(filter)) // !нужно допилить для state
+            !filter || prop.toString().toLowerCase().includes(filter)
         );
       });
-      this.tableData = kek;
     },
 
     async onLoadData() {
@@ -166,7 +136,14 @@ export default {
       const response = await fetch(this.url);
       if (response.ok) {
         let value = await response.json();
-        this.tableData = [...value];
+        this.tableData = value.map(item=>{
+          const {add} = item
+          delete item.add
+          return {
+            ...add,
+            ...item
+          }
+        });
         this.pagination.totalPages = Math.ceil(
           this.tableData.length / this.pagination.perPage
         );

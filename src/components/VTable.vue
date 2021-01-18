@@ -1,6 +1,5 @@
 <template>
   <div>
-    
     <table v-if="tableData && tableData.length > 0" class="table table-hover">
       <thead>
         <tr>
@@ -11,21 +10,22 @@
             :key="i"
             @click="sortBy(tableTh)"
           >
-            {{ tableTh }} <img
-                    v-if="sortReverse === 1 && sortColumn === tableTh"
-                    class="icon"
-                    src="@/assets/up.svg"
-                  />
-                  <img
-                    v-if="sortReverse === -1 && sortColumn === tableTh"
-                     class="icon"
-                    src="@/assets/down.svg"
-                  />
-                  <img
-                    v-if="sortColumn !== tableTh || sortReverse === 0"
-                     class="icon"
-                    src="@/assets/sort-arrows.svg"
-                  />
+            {{ tableTh }}
+            <img
+              v-if="sortReverse === 1 && sortColumn === tableTh"
+              class="icon"
+              src="@/assets/up.svg"
+            />
+            <img
+              v-if="sortReverse === -1 && sortColumn === tableTh"
+              class="icon"
+              src="@/assets/down.svg"
+            />
+            <img
+              v-if="sortColumn !== tableTh || sortReverse === 0"
+              class="icon"
+              src="@/assets/sort-arrows.svg"
+            />
           </th>
         </tr>
       </thead>
@@ -39,10 +39,7 @@
           <td>{{ tableRow.company }}</td>
           <td>{{ tableRow.email }}</td>
           <td>{{ tableRow.address }}</td>
-          <td>
-            <span v-if="tableRow.add">{{ tableRow.add.state }}</span>
-            <span v-else>Штат не указан</span>
-          </td>
+          <td> {{ tableRow.state }}</td>
         </tr>
       </tbody>
     </table>
@@ -66,14 +63,14 @@ export default {
     return {
       sortColumn: "",
       reverse: false,
-      tableData:[],
+      tableData: [],
       sortReverse: 0,
     };
   },
-  watch:{
-    data(v){
-      this.tableData = [...v]; 
-    }
+  watch: {
+    data(v) {
+      this.tableData = [...v];
+    },
   },
   methods: {
     onSelectRow(row) {
@@ -102,8 +99,8 @@ export default {
       }
     },
     sortBy: function(sortColumn) {
-      console.log('sortColumn',sortColumn)
-      console.log('sortReverse',this.sortReverse)
+      console.log("sortColumn", sortColumn);
+      console.log("sortReverse", this.sortReverse);
       // * -1 сортировка desc
       // * 1 сортировка asc
       // * 0 default
@@ -123,7 +120,7 @@ export default {
 </script>
 
 <style scoped>
-.icon{
-width: 10px;
+.icon {
+  width: 10px;
 }
 </style>
