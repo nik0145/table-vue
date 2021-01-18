@@ -70,7 +70,7 @@
         </tr>
       </tbody>
     </table> -->
-    <VTable :columns="columns" :data="tableDataDisplay"/> 
+    <VTable :columns="columns" @selectRow="onSelectRow" :data="tableDataDisplay"/> 
      <Pagination
       v-if="pagination"
       :total-pages="pagination.totalPages"
@@ -115,6 +115,7 @@ export default {
       filter: "",
       columns: ["name", "company", "email", "address", "state"],
       tableData: [],
+      tableDataDisplay: [],
       url: "https://app.dev-wazzup24.com/api/v1/wazzup_test/",
     };
   },
@@ -124,23 +125,22 @@ export default {
       default: "Загрузить пользователей",
     },
   },
-  computed: {
-    tableDataDisplay() {
-      return this.tableData.slice(
+
+  methods: {
+    onSelectRow(row ){
+      this.isOpenModal = true;
+      this.rowCurrent = row;
+    },
+    onChangeTableData(){
+      
+        this.tableDataDisplay= this.tableData.slice(
         (this.pagination.currentPage - 1) * this.pagination.perPage,
         this.pagination.currentPage * this.pagination.perPage
       );
     },
-  },
-
-  methods: {
     onPageChange(page) {
       this.pagination.currentPage = page;
-    },
-    showModal(row) {
-      console.log(this.kek);
-      this.isOpenModal = true;
-      this.rowCurrent = row;
+      this.onChangeTableData();
     },
     closeModal() {
       this.isOpenModal = false;
@@ -171,6 +171,7 @@ export default {
           this.tableData.length / this.pagination.perPage
         );
         this.pagination.totalItems = this.tableData.length;
+        this.onChangeTableData()
         this.isLoading = false;
       } else {
         this.isError = true;

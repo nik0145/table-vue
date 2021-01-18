@@ -1,9 +1,6 @@
-   <template>
-   <div>
-     <table
-      v-if="data && data.length > 0"
-      class="table table-hover"
-    >
+<template>
+  <div>
+    <table v-if="tableData && tableData.length > 0" class="table table-hover">
       <thead>
         <tr>
           <th
@@ -19,8 +16,8 @@
       </thead>
       <tbody>
         <tr
-          @click="showModal(tableRow)"
-          v-for="(tableRow, i) in data"
+          @click="onSelectRow(tableRow)"
+          v-for="(tableRow, i) in tableData"
           :key="i"
         >
           <td>{{ tableRow.name }}</td>
@@ -34,11 +31,10 @@
         </tr>
       </tbody>
     </table>
-    </div>
+  </div>
 </template>
 
 <script>
-
 export default {
   name: "Table",
   props: {
@@ -51,30 +47,64 @@ export default {
       required: true,
     },
   },
-    data() {
+  data() {
     return {
-sortColumn: "",
-reverse:false,
-sortReverse: false,
+      sortColumn: "",
+      reverse: false,
+      tableData:[],
+      sortReverse: 0,
     };
   },
-  methods:{
-          byField: function(field) {
+  watch:{
+    data(v){
+      this.tableData = [...v]; 
+    }
+  },
+  methods: {
+    onSelectRow(row) {
+      this.$emit("selectRow", row);
+    },
+    byField: function(field) {
       return (a, b) =>
-        a[field] > b[field] ? (this.reverse ? 1 : -1) : this.reverse ? -1 : 1;
+        a[field] > b[field]
+          ? this.sortReverse > 0
+            ? 1
+            : -1
+          : this.sortReverse > 0
+          ? -1
+          : 1;
+    },
+    onChangeReverse(reverse) {
+      switch (reverse) {
+        case 1:
+          return 0;
+        case 0:
+          return -1;
+        case -1:
+          return 1;
+        default:
+          return 0;
+      }
     },
     sortBy: function(sortColumn) {
-      this.reverse = this.sortColumn == sortColumn ? !this.reverse : false;
+      console.log('sortColumn',sortColumn)
+      console.log('sortReverse',this.sortReverse)
+      // * -1 сортировка desc
+      // * 1 сортировка asc
+      // * 0 default
+      this.sortReverse =
+        this.sortColumn === sortColumn
+          ? this.onChangeReverse(this.sortReverse)
+          : -1;
       this.sortColumn = sortColumn;
-      this.tableData.sort(this.byField(sortColumn));
+      if (this.sortReverse === 0) {
+        this.tableData = [...this.data];
+      } else {
+        this.tableData.sort(this.byField(sortColumn));
+      }
     },
-  }
-}
+  },
+};
 </script>
 
-   
-<style scoped>
-
-</style>
-
-  
+<style scoped></style>
