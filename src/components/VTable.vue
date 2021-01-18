@@ -1,5 +1,6 @@
 <template>
   <div>
+    
     <table v-if="tableData && tableData.length > 0" class="table table-hover">
       <thead>
         <tr>
@@ -10,7 +11,21 @@
             :key="i"
             @click="sortBy(tableTh)"
           >
-            {{ tableTh }}
+            {{ tableTh }} <img
+                    v-if="sortReverse === 1 && sortColumn === tableTh"
+                    class="icon"
+                    src="@/assets/up.svg"
+                  />
+                  <img
+                    v-if="sortReverse === -1 && sortColumn === tableTh"
+                     class="icon"
+                    src="@/assets/down.svg"
+                  />
+                  <img
+                    v-if="sortColumn !== tableTh || sortReverse === 0"
+                     class="icon"
+                    src="@/assets/sort-arrows.svg"
+                  />
           </th>
         </tr>
       </thead>
@@ -107,4 +122,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.icon{
+width: 10px;
+}
+</style>
