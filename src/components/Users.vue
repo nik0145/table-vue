@@ -68,7 +68,7 @@
           </div>
 
           <div class="alert alert-danger" v-if="isError" role="alert">
-            Ошибка получения данных
+            Error receiving data
           </div>
           <div
             v-if="isLoading"
@@ -99,7 +99,7 @@
           />
            </div>
           </div>
-          <modal
+          <VModal
             :isOpen="isOpenModal"
             :value="rowCurrent"
             @close="closeModal"
@@ -111,14 +111,14 @@
 </template>
 
 <script>
-import modal from "./modal.vue";
+import VModal from "./VModal.vue";
 import Pagination from "./Pagination.vue";
 import VTable from "./VTable.vue";
 
 export default {
   name: "HelloWorld",
   components: {
-    modal,
+    VModal,
     Pagination,
     VTable,
   },
@@ -155,6 +155,7 @@ export default {
   methods: {
     onSelectRow(row) {
       this.isOpenModal = true;
+      document.body.classList.add("modal-open");
       this.rowCurrent = row;
     },
     resetFilter() {
@@ -173,6 +174,7 @@ export default {
     },
     closeModal() {
       this.isOpenModal = false;
+      document.body.classList.remove("modal-open");
     },
     filterBy: function() {
       let filter = this.filter.toLowerCase();

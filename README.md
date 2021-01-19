@@ -9,15 +9,6 @@ yarn install
 yarn serve
 ```
 
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
 # Тестовое задание
 
 Тестовое задание нужно выполнять используя Vue.js

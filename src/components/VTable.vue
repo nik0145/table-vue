@@ -99,8 +99,6 @@ export default {
       }
     },
     sortBy: function(sortColumn) {
-      console.log("sortColumn", sortColumn);
-      console.log("sortReverse", this.sortReverse);
       // * -1 сортировка desc
       // * 1 сортировка asc
       // * 0 default

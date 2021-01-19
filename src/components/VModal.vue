@@ -5,7 +5,7 @@
         <div class="modal-container">
           <div class="modal-header">
             <slot name="header">
-              Информация о пользователе
+              User information
               <button
                 type="button"
                 @click="$emit('close')"
@@ -20,10 +20,26 @@
 
           <div class="modal-body">
             <slot name="body">
-              <ul class="list-unstyled">
-                <li>Lorem ipsum dolor sit amet</li>
-              </ul>
-              {{ value }}
+              <form>
+                <div v-for="(row,key) in value" :key="key" class="form-group row">
+              
+            
+                  <label :for="key" class="col-sm-2 col-form-label"
+                    >{{key}}</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="text"
+                      readonly
+                      :value="row"
+                      class="form-control"
+                      id="key"
+                      placeholder=""
+                    />
+                  </div>
+                 </div>
+              </form>
+              
             </slot>
           </div>
 
@@ -34,7 +50,7 @@
                 @click="$emit('close')"
                 class="btn btn-secondary"
               >
-                Ок
+                Ok
               </button>
             </slot>
           </div>
@@ -74,6 +90,7 @@ export default {
     },
     close() {
       this.$emit("close");
+        
     },
   },
 };
@@ -81,13 +98,18 @@ export default {
 <style scoped>
 .modal-mask {
   position: fixed;
+  overflow-x:hidden;
+  overflow-y:auto;
   z-index: 9998;
   top: 0;
   left: 0;
+  bottom: 0;
+  outline: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  display: flex;
+  flex-direction:column;
   background-color: rgba(0, 0, 0, 0.5);
-  display: table;
   transition: opacity 0.3s ease;
 }
 
@@ -97,7 +119,7 @@ export default {
 }
 
 .modal-container {
-  width: 300px;
+  width: 500px;
   border-radius: 10px;
   margin: 0px auto;
   background-color: #fff;
