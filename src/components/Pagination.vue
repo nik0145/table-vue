@@ -1,64 +1,60 @@
 <template>
-  <ul class="pagination">
-    <li class="pagination-item">
-      <button
-        type="button"
-        @click="onClickFirstPage"
-        :disabled="isInFirstPage"
-        aria-label="Go to first page"
-        class="pag-btn pag-pad-l"
+  <ul class="pagination justify-content-end">
+    <li class="page-item" :class="{ disabled: isInFirstPage }">
+      <a
+        class="page-link"
+        @click.prevent="onClickFirstPage"
+        href="#"
+        aria-label="First"
       >
-        <i class="arrow left"></i><i class="arrow left" style="margin-left:-0.3rem"></i>
-      </button>
+        <span aria-hidden="true">&laquo;</span>
+        <span class="sr-only">Previous</span>
+      </a>
+    </li>
+    <li class="page-item" :class="{ disabled: isInFirstPage }">
+      <a
+        class="page-link"
+        @click.prevent="onClickFirstPage"
+        href="#"
+        tabindex="-1"
+        >Previous</a
+      >
     </li>
 
-    <li class="pagination-item">
+    <li
+      v-for="(page, i) in pages"
+      class="page-item"
+      :class="{ active: isPageActive(page.name) }"
+      :key="i"
+    >
       <button
         type="button"
-        @click="onClickPreviousPage"
-        :disabled="isInFirstPage"
-        aria-label="Go to previous page"
-        class="pag-btn"
-      >
-        <i class="arrow left"></i>
-      </button>
-    </li>
-
-    <li v-for="(page,i) in pages" class="pagination-item" :key="i" >
-      <button
-        type="button"
-        @click="onClickPage(page.name)"
+        @click.prevent="onClickPage(page.name)"
         :disabled="page.isDisabled"
-        :class="{ active: isPageActive(page.name) }"
-        class="pag-btn"
+        class="page-link"
         :aria-label="`Go to page number ${page.name}`"
       >
         {{ page.name }}
       </button>
     </li>
-
-    <li class="pagination-item">
-      <button
-        type="button"
-        @click="onClickNextPage"
-        :disabled="isInLastPage"
-        aria-label="Go to next page"
-        class="pag-btn pag-pad-r"
+    <li class="page-item" :class="{ disabled: isInLastPage }">
+      <a
+        @click.prevent="onClickNextPage"
+        class="page-link"
+        href="#"
+        >Next</a
       >
-        <i class="arrow right"></i>
-      </button>
     </li>
 
-    <li class="pagination-item">
-      <button
-        type="button"
-        @click="onClickLastPage"
-        :disabled="isInLastPage"
-        aria-label="Go to last page"
-        class="pag-btn pag-pad-r"
+    <li class="page-item" :class="{ disabled: isInLastPage }">
+      <a
+        @click.prevent="onClickLastPage"
+        class="page-link"
+        href="#"
+        aria-label="Last"
       >
-        <i class="arrow right"></i><i class="arrow right" style="margin-left:-0.3rem"></i>
-      </button>
+        <span aria-hidden="true">&raquo;</span>
+      </a>
     </li>
   </ul>
 </template>
@@ -146,84 +142,4 @@ export default {
 };
 </script>
 
-<style scoped >
-.pagination {
-  display: flex;
-  list-style: none;
-}
-  .pag-btn {
-    width: 33px;
-    height: 33px;
-    font-weight: 500;
-    color:#231f20;
-    background: ghostwhite;
-    border-radius: 50%;
-    margin-right: 16px;
-    border:2px solid dodgerblue;
-    }
-     .pag-btn:disabled {
-      color: #b8b8b8;
-      cursor: auto;
-    }
-      .arrow {
-    border: solid grey;
-    border-width: 0 1px 1px 0;
-    display: inline-block;
-    padding: 4px;
-  }
-   .active {
-       background-color: #1774e2;
-      color: #fff;
-      border: 2px solid #1774e2;
-      color: #231f20;
-    }
-    .right {
-    transform: rotate(-45deg);
-  }
-
-  .left {
-    transform: rotate(135deg);
-  }
-/* 
-  .pag-btn {
-    width: 4rem;
-    height: 4rem;
-    font-family: "Roboto", sans-serif;
-    font-size: 1.6rem;
-    font-weight: 500;
-    color: $color-grey;
-    background: $color-grey-light;
-    border-radius: 50%;
-    margin-right: 1rem;
-
-    &:disabled {
-      color: #b8b8b8;
-      cursor: auto;
-    }
-    &.active {
-      // background-color: $color-primary;
-      // color: #fff;
-      border: 2px solid $color-primary;
-      color: $color-text;
-    }
-
-    // &:focus {
-    //   border: 2px solid $color-primary;
-    //   color: $color-text;
-    // }
-  }
-  .arrow {
-    border: solid $color-grey;
-    border-width: 0 1px 1px 0;
-    display: inline-block;
-    padding: 4px;
-  }
-
-  .right {
-    transform: rotate(-45deg);
-  }
-
-  .left {
-    transform: rotate(135deg);
-  } */
-</style>
+<style scoped></style>

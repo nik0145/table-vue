@@ -120,6 +120,9 @@ export default {
 </script>
 
 <style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
 .icon {
   width: 10px;
 }
