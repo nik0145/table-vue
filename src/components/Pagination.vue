@@ -1,5 +1,5 @@
 <template>
-  <ul class="pagination justify-content-end">
+  <ul class="pagination justify-content-end" style="margin-bottom:0px">
     <li class="page-item" :class="{ disabled: isInFirstPage }">
       <a
         class="page-link"

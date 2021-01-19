@@ -12,8 +12,9 @@
           class="form-control form-control-dark  py-2 border-right-0"
           type="search"
           v-model="filter"
-          placeholder="Поиск по таблице"
-          aria-label="Поиск по таблице"
+          :readonly="tableData.length===0"
+          placeholder="Search in a table"
+          aria-label="Search in a table"
         />
         <span class="input-group-append">
           <button
@@ -29,7 +30,7 @@
 
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" @click="filterBy" href="#">Search</a>
+          <a class="nav-link" :class="{'disabled':tableData.length===0}" @click.prevent="filterBy" href="#">Search</a>
         </li>
       </ul>
     </nav>
@@ -76,22 +77,28 @@
           >
             <span class="sr-only">Loading...</span>
           </div>
-          <div class="table-responsive">
+          <div class="flex-column-custom">
+
+         <div class="table">
             <VTable
               :columns="columns"
               @selectRow="onSelectRow"
               :data="tableDataDisplay"
             />
-          </div>
-          <Pagination
-            v-if="pagination"
+             </div>
+            <div class="paginaiton">
+
+           
+           <Pagination
+            v-if="pagination && pagination.totalPages"
             :total-pages="pagination.totalPages"
             :total="pagination.totalItems"
             :per-page="pagination.perPage"
             :current-page="pagination.currentPage"
             @pagechanged="onPageChange"
           />
-
+           </div>
+          </div>
           <modal
             :isOpen="isOpenModal"
             :value="rowCurrent"
@@ -141,7 +148,7 @@ export default {
   props: {
     description: {
       type: String,
-      default: "Загрузить пользователей",
+      default: "Upload users",
     },
   },
 
@@ -183,7 +190,8 @@ export default {
 
     async onLoadData() {
       this.isLoading = true;
-      const response = await fetch(this.url);
+      try {
+          const response = await fetch(this.url);
       if (response.ok) {
         let value = await response.json();
         this.tableData = value.map((item) => {
@@ -204,6 +212,11 @@ export default {
         this.isError = true;
         this.isLoading = false;
       }
+      } catch (error) {
+         this.isError = true;
+        this.isLoading = false;
+      }
+    
     },
   },
 };
@@ -211,6 +224,18 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.flex-column-custom{
+  display: flex;
+  flex-direction: column;
+  height: 470px;
+
+}
+.table{
+  flex:12;
+}
+.paginaiton{
+  flex:1;
+}
 .icon {
   width: 10px;
 }
